@@ -133,9 +133,10 @@ fastmcp dev inspector src\grafana_mcp\server.py:mcp --no-reload
 Open the URL shown by Inspector, normally `http://localhost:6274`, and enable the server connection
 toggle. Inspector should display seven tools, four resources, one resource template, and three prompts.
 
-For Copilot, `.copilot/mcp-config.json` contains a ready-to-edit `grafana-mcp` stdio configuration
-for `http://localhost:3000/`. Replace `PASTE_GRAFANA_SERVICE_ACCOUNT_TOKEN_HERE` locally with a
-Grafana Viewer service-account token. Never commit the populated token.
+For Copilot, add the `grafana-mcp` stdio configuration to the user-level file
+`C:\Users\Tamal\.copilot\mcp-config.json`. Set `GRAFANA_URL` to `http://localhost:3000/` and replace
+the token placeholder locally with a Grafana Viewer service-account token. Never store the populated
+token in the repository.
 
 ## Stop the environment
 
