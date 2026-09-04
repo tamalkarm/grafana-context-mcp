@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "grafana-mcp": {
+      "command": "E:\\AI\\repos\\TestProject\\.venv\\Scripts\\grafana-mcp.exe",
+      "args": [],
+      "env": {
+        "GRAFANA_URL": "http://localhost:3000/",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "PASTE_GRAFANA_SERVICE_ACCOUNT_TOKEN_HERE"
+      }
+    }
+  }
+}
