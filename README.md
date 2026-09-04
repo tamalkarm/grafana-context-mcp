@@ -4,6 +4,9 @@ A Python FastMCP server that gives assistants read-only access to Grafana and th
 interpret what they find. It exposes static guidance and live objects as **resources**, Grafana API
 operations as **tools**, and repeatable investigation workflows as **prompts**.
 
+For a concise start, load-injection, architecture, MCP Inspector, and shutdown guide, see
+[`DEMO-RUNBOOK.md`](DEMO-RUNBOOK.md).
+
 ## Single-VM demo stack
 
 The repository includes a Docker Compose demo with an instrumented Python application, a synthetic
