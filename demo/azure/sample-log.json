@@ -1,0 +1,15 @@
+[
+  {
+    "TimeGenerated": "2026-09-04T00:00:00Z",
+    "ServiceName": "prometheus-grafana-demo",
+    "Environment": "demo",
+    "Level": "Information",
+    "Message": "GET /api/work completed with HTTP 200",
+    "RequestId": "00000000-0000-0000-0000-000000000000",
+    "Method": "GET",
+    "Route": "/api/work",
+    "StatusCode": 200,
+    "DurationMs": 125.5,
+    "ClientIp": "172.20.0.2"
+  }
+]

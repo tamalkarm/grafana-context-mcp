@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: demo-app
+    metrics_path: /metrics
+    static_configs:
+      - targets: [demo-app:8000]
+        labels:
+          environment: demo

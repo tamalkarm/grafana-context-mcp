@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: Demo Log Analytics
+    uid: log-analytics-demo
+    type: grafana-azure-monitor-datasource
+    access: proxy
+    editable: false
+    jsonData:
+      azureAuthType: clientsecret
+      cloudName: azuremonitor
+      subscriptionId: ${AZURE_SUBSCRIPTION_ID}
+      tenantId: ${AZURE_TENANT_ID}
+      clientId: ${AZURE_CLIENT_ID}
+    secureJsonData:
+      clientSecret: ${AZURE_CLIENT_SECRET}
+    version: 1

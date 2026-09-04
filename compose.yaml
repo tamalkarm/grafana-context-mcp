@@ -1,0 +1,92 @@
+services:
+  demo-app:
+    build:
+      context: ./demo/app
+    restart: unless-stopped
+    environment:
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT:-demo}
+      AZURE_MONITOR_ENDPOINT: ${AZURE_MONITOR_ENDPOINT:-}
+      AZURE_MONITOR_DCR_RULE_ID: ${AZURE_MONITOR_DCR_RULE_ID:-}
+      AZURE_MONITOR_EVENT_DCR_RULE_ID: ${AZURE_MONITOR_EVENT_DCR_RULE_ID:-}
+      AZURE_MONITOR_STREAM_NAME: ${AZURE_MONITOR_STREAM_NAME:-}
+      AZURE_MONITOR_EVENT_STREAM_NAME: ${AZURE_MONITOR_EVENT_STREAM_NAME:-}
+      AZURE_MONITOR_BATCH_SIZE: ${AZURE_MONITOR_BATCH_SIZE:-25}
+      AZURE_MONITOR_FLUSH_INTERVAL_SECONDS: ${AZURE_MONITOR_FLUSH_INTERVAL_SECONDS:-5}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-}
+    ports:
+      - "${DEMO_APP_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [observability]
+
+  load-generator:
+    image: curlimages/curl:8.16.0
+    restart: unless-stopped
+    depends_on:
+      demo-app:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          curl -fsS "http://demo-app:8000/api/work?delay_ms=$$(($$RANDOM % 450 + 25))" >/dev/null || true
+          if [ $$(($$RANDOM % 10)) -eq 0 ]; then
+            curl -s "http://demo-app:8000/api/work?fail=true" >/dev/null || true
+          fi
+          sleep 1
+        done
+    networks: [observability]
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./demo/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-lifecycle
+    depends_on:
+      demo-app:
+        condition: service_healthy
+    networks: [observability]
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      AZURE_SUBSCRIPTION_ID: ${AZURE_SUBSCRIPTION_ID:-}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-}
+    volumes:
+      - ./demo/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./demo/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks: [observability]
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  observability:
+    driver: bridge

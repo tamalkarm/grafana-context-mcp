@@ -1,0 +1,59 @@
+{
+  "location": "westus",
+  "kind": "Direct",
+  "properties": {
+    "dataCollectionEndpointId": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Insights/dataCollectionEndpoints/<data-collection-endpoint>",
+    "streamDeclarations": {
+      "Custom-DemoApplicationLogs": {
+        "columns": [
+          { "name": "TimeGenerated", "type": "datetime" },
+          { "name": "ServiceName", "type": "string" },
+          { "name": "Environment", "type": "string" },
+          { "name": "Level", "type": "string" },
+          { "name": "Message", "type": "string" },
+          { "name": "RequestId", "type": "string" },
+          { "name": "Method", "type": "string" },
+          { "name": "Route", "type": "string" },
+          { "name": "StatusCode", "type": "int" },
+          { "name": "DurationMs", "type": "real" },
+          { "name": "ClientIp", "type": "string" }
+        ]
+      },
+      "Custom-DemoApplicationEvents": {
+        "columns": [
+          { "name": "TimeGenerated", "type": "datetime" },
+          { "name": "ServiceName", "type": "string" },
+          { "name": "Environment", "type": "string" },
+          { "name": "Level", "type": "string" },
+          { "name": "EventType", "type": "string" },
+          { "name": "Message", "type": "string" },
+          { "name": "RequestId", "type": "string" },
+          { "name": "ExceptionType", "type": "string" },
+          { "name": "StackTrace", "type": "string" }
+        ]
+      }
+    },
+    "destinations": {
+      "logAnalytics": [
+        {
+          "workspaceResourceId": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.OperationalInsights/workspaces/<workspace-name>",
+          "name": "demo-workspace"
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": ["Custom-DemoApplicationLogs"],
+        "destinations": ["demo-workspace"],
+        "transformKql": "source",
+        "outputStream": "Custom-DemoApplicationLogs_CL"
+      },
+      {
+        "streams": ["Custom-DemoApplicationEvents"],
+        "destinations": ["demo-workspace"],
+        "transformKql": "source",
+        "outputStream": "Custom-DemoApplicationEvents_CL"
+      }
+    ]
+  }
+}
