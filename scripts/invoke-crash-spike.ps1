@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.Net.Http
 $client = [System.Net.Http.HttpClient]::new()
 $client.Timeout = [TimeSpan]::FromSeconds(10)
 $crashUri = [uri]::new($ApplicationUrl, "/api/crash")
@@ -28,7 +29,7 @@ try {
         $request.Headers.Add("X-Request-ID", "$scenarioId-$index")
 
         try {
-            $response = $client.Send($request)
+            $response = $client.SendAsync($request).GetAwaiter().GetResult()
             if ([int]$response.StatusCode -eq 500) {
                 $failures++
             } else {
